@@ -14,12 +14,17 @@ io.on('connection', (socket) => {
     console.log('New User Connected')
     socket.on('createMessage', (data) => {
         console.log('create message', data)
+        io.emit('newMessage', {
+            from: data.from,
+            message: data.message,
+            createdAt: new Date().getTime()
+        })
     })
-    socket.emit('newMessage', {
-        from    : 'kashish',
-        message: 'message received',
-        createdAt: new Date().getTime().toString()
-    })
+    // socket.emit('newMessage', {
+    //     from    : 'kashish',
+    //     message: 'message received',
+    //     createdAt: new Date().getTime().toString()
+    // })
     socket.on('disconnect', () => {
         console.log('User was disconnected')
     })
