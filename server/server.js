@@ -7,7 +7,7 @@ const publicPath = path.join(__dirname, '../public')
 const app = express()
 var server = http.createServer(app)
 var io = SocketIO(server)
-const {generateMessage} = require('./utils/message')
+const {generateMessage, generateLocationMessage} = require('./utils/message')
 
 app.use(express.static(publicPath))
 
@@ -20,11 +20,11 @@ io.on('connection', (socket) => {
         console.log('create message', data)
         io.emit('newMessage', generateMessage(data.from, data.message))
         callback('this is from server')
-        // socket.broadcast.emit('newMessage', {
-        //     from: data.from,
-        //     message: data.message,
-        //     createdAt: new Date().getTime()
-        // })
+       
+    })
+
+    socket.on('createLocationMessage', (coords) => {
+        io.emit('newLocationMessage', generateLocationMessage('Admin', coords.lat, coords.long))
     })
     socket.on('disconnect', () => {
         console.log('User was disconnected')
