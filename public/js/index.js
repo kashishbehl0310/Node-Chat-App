@@ -40,7 +40,7 @@ $('#message-form').on('submit', function(e){
         from: 'User',
         message: $('[name=message]').val()
     }, function(){
-
+        $('[name=message]').val('')
     })
 })
 
@@ -50,12 +50,16 @@ locationButton.on('click', function(){
     if(!navigator.geolocation){
         return alert('Geolocation Not Supported')
     }
+    locationButton.attr('disabled', 'disabled').text('Sending Location ...')
+
     navigator.geolocation.getCurrentPosition(function(position){
+        locationButton.removeAttr('disabled').text('Send Location')
         socket.emit('createLocationMessage',{
             lat: position.coords.latitude,
             long: position.coords.longitude
         })
     }, function(){
+        locationButton.removeAttr('disabled').text('Send Location')        
         console.log('Unable to fetch location')
     })
 })
