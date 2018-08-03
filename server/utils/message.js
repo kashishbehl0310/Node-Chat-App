@@ -1,9 +1,10 @@
 const moment = require('moment')
 
-const generateMessage = (from, message) => {
+const generateMessage = (from, message, clientId) => {
     return {
         from, 
         message,
+        clientId,
         createdAt: moment().valueOf()
     }
 }

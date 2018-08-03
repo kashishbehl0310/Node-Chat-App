@@ -1,5 +1,7 @@
 var socket = io();
 
+let clientSocketId;
+
 function scrollToBottom(){
     var messages = $('#messages')
     var newMessage = messages.children('li:last-child')
@@ -13,7 +15,15 @@ function scrollToBottom(){
 }
 
 socket.on('connect', function() {
-    console.log('Connected to server')
+    var params = jQuery.deparam(window.location.search)
+    socket.emit('join', params, function(err){
+        if(err){
+            alert(err)
+            window.location.href = '/'
+        }else{
+            console.log('No error')
+        }
+    })
 })
 
 // socket.emit('createMessage', {
@@ -23,17 +33,6 @@ socket.on('connect', function() {
 
 socket.on('disconnect', function(){
     console.log('Disconnected from server')
-})
-socket.on('newMessage', function(message){
-    var formattedTime = moment(message.createdAt).format('h:mm a')
-    var template = $('#message-template').html()
-    var html = Mustache.render(template,{
-        text: message.message,
-        from: message.from,
-        createdAt: formattedTime
-    })
-    $('#messages').append(html)
-    scrollToBottom()
 })
 
 socket.on('newLocationMessage', function(message){
@@ -56,12 +55,39 @@ socket.on('newLocationMessage', function(message){
 
 $('#message-form').on('submit', function(e){
     e.preventDefault()
+    clientSocketId = socket.id;
+    console.log('aaaaaaaaaaa', clientSocketId)
     socket.emit('createMessage', {
         from: 'User',
-        message: $('[name=message]').val()
+        message: $('[name=message]').val(),
+        clientId: clientSocketId
     }, function(){
         $('[name=message]').val('')
     })
+})
+
+socket.on('newMessage', function(message){
+    
+    var formattedTime = moment(message.createdAt).format('h:mm a')
+    var cssClass = '';
+    var template = $('#message-template').html()
+    if(clientSocketId === message.clientId && clientSocketId != undefined){
+        cssClass = 'GreenText'   
+        console.log(cssClass) 
+    }else{
+        cssClass = 'BlueText'
+        console.log(cssClass)
+    }
+    var html = Mustache.render(template,{
+        text: message.message,
+        from: message.from,
+        createdAt: formattedTime,
+        clientId: message.clientId,
+        class: cssClass
+    })
+    
+    $('#messages').append(html)
+    scrollToBottom()
 })
 
 
