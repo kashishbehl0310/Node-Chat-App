@@ -66,7 +66,6 @@ $('#message-form').on('submit', function(e){
     clientSocketId = socket.id;
     console.log('aaaaaaaaaaa', clientSocketId)
     socket.emit('createMessage', {
-        from: 'User',
         message: $('[name=message]').val(),
         clientId: clientSocketId
     }, function(){
